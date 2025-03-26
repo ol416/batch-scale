@@ -1,148 +1,80 @@
 const photoshop = require('photoshop');
-const app = require('photoshop').app;
+const app = photoshop.app;
 
-document
-  .getElementById("btnScale")
-  .addEventListener("click", scaleLayers);
-
-document
-  .getElementById("btnAbScale")
-  .addEventListener("click", absoluteScaleLayers);
+document.getElementById("btnScale").addEventListener("click", () => processScaling(false));
+document.getElementById("btnAbScale").addEventListener("click", () => processScaling(true));
 
 const sizeInput = document.getElementById("sizeInput");
-sizeInput.addEventListener("change", () => {
-  localStorage.setItem("size", sizeInput.value);
-})
 sizeInput.value = localStorage.getItem("size") || sizeInput.value;
+sizeInput.addEventListener("change", () => localStorage.setItem("size", sizeInput.value));
 
-function scaleLayers() {
+photoshop.action.addNotificationListener(['select'], handleSelectionChange);
+
+function handleSelectionChange() {
   const activeLayers = app.activeDocument.activeLayers;
+  const displayElement = document.getElementById('currentScaleDisplay');
+  
   if (!activeLayers.length) {
-    app.showAlert("请选择一个图层");
-    return
-  }
-  const size = Number(sizeInput.value)
-
-  if (size === 100) {
-    app.showAlert("请选择一个100%以外的比例");
-    return
+    displayElement.textContent = '缩放: --%';
+    return;
   }
 
-  const toSmartObject = {
-    _obj: "newPlacedLayer"
-  };
-
-  activeLayers.forEach(layer => layer.selected = false);
-
-  activeLayers.forEach((layer, idx) => {
-    layer.selected = true;
-
-    if (layer.kind !== 5) {
-      photoshop.action.batchPlay([toSmartObject], { synchronousExecution: true });
-    }
-    layer = app.activeDocument.activeLayers[0];
-    activeLayers[idx] = layer;
-
-    layer.scale(size, size);
-    layer.selected = false;
-  });
-
-  activeLayers.forEach(layer => layer.selected = true);
+  const scaleInfo = getCurrentScale(activeLayers[0]);
+  displayElement.textContent = scaleInfo ? formatScaleText(scaleInfo) : '缩放: --%';
 }
 
-function absoluteScaleLayers() {
-  const doc = app.activeDocument;
+function processScaling(isAbsolute) {
   const activeLayers = app.activeDocument.activeLayers;
-  if (!activeLayers.length) {
-    app.showAlert("请选择一个图层");
-    return
-  }
-  const size = Number(sizeInput.value)
+  if (!activeLayers.length) return app.showAlert("请选择一个图层");
 
-  if (size === 100) {
-    app.showAlert("请选择一个100%以外的比例");
-    return
-  }
+  const size = Number(sizeInput.value);
+  if (size === 100) return app.showAlert("请选择一个100%以外的比例");
 
-  const toSmartObject = {
-    _obj: "newPlacedLayer"
-  };
-
-  activeLayers.forEach(layer => layer.selected = false);
-
-  activeLayers.forEach((layer, idx) => {
-    layer.selected = true;
-
+  activeLayers.forEach(layer => {
     if (layer.kind !== 5) {
-      photoshop.action.batchPlay([toSmartObject], { synchronousExecution: true });
+      photoshop.action.batchPlay([{ _obj: "newPlacedLayer" }], { synchronousExecution: true });
+      layer = app.activeDocument.activeLayers[0];
     }
-    layer = app.activeDocument.activeLayers[0];
-    activeLayers[idx] = layer;
-
-    scaleSmartObjectLayer(layer, size, doc.resolution);
-    layer.selected = false;
+    isAbsolute ? scaleSmartObjectLayer(layer, size, app.activeDocument.resolution) : layer.scale(size, size);
   });
-
-  activeLayers.forEach(layer => layer.selected = true);
 }
 
-
-function calculateScaleFactor(
-  currentSize,
-  targetScale,
-  originalSize,
-  smartObjectResolution,
-  currentResolution
-) {
-  return (
-    (targetScale * originalSize * currentResolution) /
-    (currentSize * smartObjectResolution)
-  );
-}
-
-function scaleSmartObjectLayer(layer, scaleValue, currentRulerUnits) {
+function scaleSmartObjectLayer(layer, scaleValue, currentResolution) {
   try {
     const bounds = layer.bounds;
-    const currentWidth = bounds.right - bounds.left;
-    const currentHeight = bounds.bottom - bounds.top;
-
-    const sizeInfo = photoshop.action.batchPlay(
-      [
-        {
-          _obj: "get",
-          _target: [
-            { _property: "smartObjectMore" },
-            { _ref: "layer", _enum: "ordinal", _value: "targetEnum" },
-          ],
-        },
-      ],
-      { synchronousExecution: true }
-    );
-
-    const size = {
-      width: sizeInfo[0].smartObjectMore.size.width,
-      height: sizeInfo[0].smartObjectMore.size.height,
-      resolution: sizeInfo[0].smartObjectMore.resolution._value
-    };
-
-    const smartObjectResolution = size.resolution;
-
-    const newWidth = calculateScaleFactor(
-      currentWidth,
-      scaleValue,
-      size.width,
-      smartObjectResolution,
-      currentRulerUnits
-    );
-    const newHeight = calculateScaleFactor(
-      currentHeight,
-      scaleValue,
-      size.height,
-      smartObjectResolution,
-      currentRulerUnits
-    );
+    const sizeInfo = photoshop.action.batchPlay([
+      { _obj: "get", _target: [{ _property: "smartObjectMore" }, { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }] }
+    ], { synchronousExecution: true })[0].smartObjectMore;
+    
+    const smartObjectResolution = sizeInfo.resolution._value;
+    const newWidth = calculateScaleFactor(bounds.right - bounds.left, scaleValue, sizeInfo.size.width, smartObjectResolution, currentResolution);
+    const newHeight = calculateScaleFactor(bounds.bottom - bounds.top, scaleValue, sizeInfo.size.height, smartObjectResolution, currentResolution);
+    
     layer.scale(newWidth, newHeight);
   } catch (error) {
     app.showAlert("缩放失败: " + error.message);
   }
+}
+
+function calculateScaleFactor(currentSize, targetScale, originalSize, smartObjectResolution, currentResolution) {
+  return (targetScale * originalSize * currentResolution) / (currentSize * smartObjectResolution);
+}
+
+function getCurrentScale(layer) {
+  if (layer.kind !== 5) return null;
+
+  const bounds = layer.bounds;
+  const sizeInfo = photoshop.action.batchPlay([
+    { _obj: "get", _target: [{ _property: "smartObjectMore" }, { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }] }
+  ], { synchronousExecution: true })[0].smartObjectMore;
+  
+  const scaleX = (bounds.right - bounds.left) * sizeInfo.resolution._value / (sizeInfo.size.width * app.activeDocument.resolution);
+  const scaleY = (bounds.bottom - bounds.top) * sizeInfo.resolution._value / (sizeInfo.size.height * app.activeDocument.resolution);
+  
+  return { scaleX, scaleY };
+}
+
+function formatScaleText({ scaleX, scaleY }) {
+  const avgScale = ((scaleX + scaleY) / 2) * 100;
+  return Math.abs(scaleX - scaleY) * 100 <= 0.03 ? `缩放:${avgScale.toFixed(2)}%` : `缩放:${(scaleX * 100).toFixed(2)}%|${(scaleY * 100).toFixed(2)}%`;
 }

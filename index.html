@@ -1,22 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <script src="index.js"></script>    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photoshop Scale Tool</title>
+    <script src="index.js" defer></script>
+    <style>
+        body {
+            color:#000000;
+            padding: 16px;
+            font-family: Arial, sans-serif;
+            /* background-color: #333; */
+        }
+        #currentScaleDisplay {
+            color: #767676;
+            font-size: 15px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        sp-textfield {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        footer {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        sp-button {
+            flex: 1;
+        }
+    </style>
 </head>
-<style>
-  body {
-    color: white;
-    padding: 0 16px;
-  }
-</style>
 <body>
-  <sp-heading>Scale Layers</sp-heading>
-  <sp-textfield id="sizeInput" type="number" value="100">
-    <sp-label slot="label">Size (%)</sp-label>
-  </sp-textfield>
-  <footer>
-    <sp-button id="btnScale">相对缩放</sp-button>
-    <sp-button id="btnAbScale">绝对缩放</sp-button>
-  </footer>
+    <h2>Scale Layers</h2>
+    <sp-textfield id="sizeInput" type="number" value="100" min="1" max="1000">
+        <sp-label slot="label">Size (%)</sp-label>
+    </sp-textfield>
+    <sp-label id="currentScaleDisplay">缩放: --%</sp-label>
+    <footer>
+        <sp-button id="btnScale" variant="primary">相对缩放</sp-button>
+        <sp-button id="btnAbScale" variant="secondary">绝对缩放</sp-button>
+    </footer>
 </body>
 </html>
