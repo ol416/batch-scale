@@ -87,11 +87,11 @@ function scaleSmartObjectLayer(layer, scaleValue, currentResolution) {
     const sizeInfo = photoshop.action.batchPlay([
       { _obj: "get", _target: [{ _property: "smartObjectMore" }, { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }] }
     ], { synchronousExecution: true })[0].smartObjectMore;
-    
+
     const smartObjectResolution = sizeInfo.resolution._value;
     const newWidth = calculateScaleFactor(bounds.right - bounds.left, scaleValue, sizeInfo.size.width, smartObjectResolution, currentResolution);
     const newHeight = calculateScaleFactor(bounds.bottom - bounds.top, scaleValue, sizeInfo.size.height, smartObjectResolution, currentResolution);
-    
+
     layer.scale(newWidth, newHeight);
   } catch (error) {
     app.showAlert("缩放失败: " + error.message);
@@ -109,10 +109,10 @@ function getCurrentScale(layer) {
   const sizeInfo = photoshop.action.batchPlay([
     { _obj: "get", _target: [{ _property: "smartObjectMore" }, { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }] }
   ], { synchronousExecution: true })[0].smartObjectMore;
-  
+
   const scaleX = (bounds.right - bounds.left) * sizeInfo.resolution._value / (sizeInfo.size.width * app.activeDocument.resolution);
   const scaleY = (bounds.bottom - bounds.top) * sizeInfo.resolution._value / (sizeInfo.size.height * app.activeDocument.resolution);
-  
+
   return { scaleX, scaleY };
 }
 
