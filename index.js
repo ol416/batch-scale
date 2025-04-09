@@ -32,24 +32,43 @@ function handleSelectionChange() {
   displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
 }
 
-function processScaling(isAbsolute) {
+// Helper function to select a layer by its ID
+async function selectLayerById(layerId) {
+  await photoshop.action.batchPlay([
+    {
+      _obj: "select",
+      _target: [
+        {
+          _ref: "layer",
+          _id: layerId
+        }
+      ],
+      makeVisible: false,
+      layerID: [layerId]
+    }
+  ], { synchronousExecution: true });
+}
+
+async function processScaling(isAbsolute) {
   const activeLayers = app.activeDocument.activeLayers;
   if (!activeLayers.length) return app.showAlert("请选择一个图层");
 
   const size = Number(sizeInput.value);
   if (size === 100) return app.showAlert("请选择一个100%以外的比例");
 
-  activeLayers.forEach(layer => {
-    if (layer.kind !== 5) {
+  for (const layer of activeLayers) {
+    await selectLayerById(layer._id);
+    let currentLayer = app.activeDocument.activeLayers[0];
+    if (currentLayer.kind !== 5) {
       photoshop.action.batchPlay([{ _obj: "newPlacedLayer" }], { synchronousExecution: true });
-      layer = app.activeDocument.activeLayers[0];
+      currentLayer = app.activeDocument.activeLayers[0];
     }
     if (isAbsolute) {
-        scaleSmartObjectLayer(layer, size, app.activeDocument.resolution);
+        scaleSmartObjectLayer(currentLayer, size, app.activeDocument.resolution);
     } else {
-        layer.scale(size, size);
+        currentLayer.scale(size, size);
     }
-  });
+  }
   // Update the display after scaling all layers
   const displayElement = document.getElementById('currentScaleDisplay');
   const avgScaleInfo = getAverageScale(activeLayers);
@@ -57,24 +76,26 @@ function processScaling(isAbsolute) {
 }
 
 // New function for step scaling
-function processStepScaling(direction) {
+async function processStepScaling(direction) {
     const activeLayers = app.activeDocument.activeLayers;
     if (!activeLayers.length) return app.showAlert("请选择一个图层");
 
     const step = Number(stepInput.value);
     if (isNaN(step)) return app.showAlert("请输入有效的步进值");
 
-    activeLayers.forEach(layer => {
-        if (layer.kind !== 5) {
+    for (const layer of activeLayers) {
+        await selectLayerById(layer._id);
+        let currentLayer = app.activeDocument.activeLayers[0];
+        if (currentLayer.kind !== 5) {
             photoshop.action.batchPlay([{ _obj: "newPlacedLayer" }], { synchronousExecution: true });
-            layer = app.activeDocument.activeLayers[0];
+            currentLayer = app.activeDocument.activeLayers[0];
         }
-        const currentScale = getCurrentScale(layer);
+        const currentScale = getCurrentScale(currentLayer);
         if (!currentScale) return;
         const currentAvgScale = (currentScale.scaleX + currentScale.scaleY) / 2;
         const newScale = (currentAvgScale * 100) + (step * direction);
-        scaleSmartObjectLayer(layer, newScale, app.activeDocument.resolution);
-    });
+        scaleSmartObjectLayer(currentLayer, newScale, app.activeDocument.resolution);
+    }
     // Update the display after scaling all layers
     const displayElement = document.getElementById('currentScaleDisplay');
     const avgScaleInfo = getAverageScale(activeLayers);
