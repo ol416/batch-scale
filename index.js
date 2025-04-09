@@ -4,9 +4,17 @@ const app = photoshop.app;
 document.getElementById("btnScale").addEventListener("click", () => processScaling(false));
 document.getElementById("btnAbScale").addEventListener("click", () => processScaling(true));
 
+// New event listeners for the step buttons
+document.getElementById("btnScaleDown").addEventListener("click", () => processStepScaling(-1));
+document.getElementById("btnScaleUp").addEventListener("click", () => processStepScaling(1));
+
 const sizeInput = document.getElementById("sizeInput");
 sizeInput.value = localStorage.getItem("size") || sizeInput.value;
 sizeInput.addEventListener("change", () => localStorage.setItem("size", sizeInput.value));
+
+const stepInput = document.getElementById("stepInput");
+stepInput.value = localStorage.getItem("step") || stepInput.value;
+stepInput.addEventListener("change", () => localStorage.setItem("step", stepInput.value));
 
 photoshop.action.addNotificationListener(['select'], handleSelectionChange);
 
@@ -19,8 +27,9 @@ function handleSelectionChange() {
     return;
   }
 
-  const scaleInfo = getCurrentScale(activeLayers[0]);
-  displayElement.textContent = scaleInfo ? formatScaleText(scaleInfo) : '缩放: --%';
+  // Calculate and display the average scale of all selected layers
+  const avgScaleInfo = getAverageScale(activeLayers);
+  displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
 }
 
 function processScaling(isAbsolute) {
@@ -35,8 +44,41 @@ function processScaling(isAbsolute) {
       photoshop.action.batchPlay([{ _obj: "newPlacedLayer" }], { synchronousExecution: true });
       layer = app.activeDocument.activeLayers[0];
     }
-    isAbsolute ? scaleSmartObjectLayer(layer, size, app.activeDocument.resolution) : layer.scale(size, size);
+    if (isAbsolute) {
+        scaleSmartObjectLayer(layer, size, app.activeDocument.resolution);
+    } else {
+        layer.scale(size, size);
+    }
   });
+  // Update the display after scaling all layers
+  const displayElement = document.getElementById('currentScaleDisplay');
+  const avgScaleInfo = getAverageScale(activeLayers);
+  displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
+}
+
+// New function for step scaling
+function processStepScaling(direction) {
+    const activeLayers = app.activeDocument.activeLayers;
+    if (!activeLayers.length) return app.showAlert("请选择一个图层");
+
+    const step = Number(stepInput.value);
+    if (isNaN(step)) return app.showAlert("请输入有效的步进值");
+
+    activeLayers.forEach(layer => {
+        if (layer.kind !== 5) {
+            photoshop.action.batchPlay([{ _obj: "newPlacedLayer" }], { synchronousExecution: true });
+            layer = app.activeDocument.activeLayers[0];
+        }
+        const currentScale = getCurrentScale(layer);
+        if (!currentScale) return;
+        const currentAvgScale = (currentScale.scaleX + currentScale.scaleY) / 2;
+        const newScale = (currentAvgScale * 100) + (step * direction);
+        scaleSmartObjectLayer(layer, newScale, app.activeDocument.resolution);
+    });
+    // Update the display after scaling all layers
+    const displayElement = document.getElementById('currentScaleDisplay');
+    const avgScaleInfo = getAverageScale(activeLayers);
+    displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
 }
 
 function scaleSmartObjectLayer(layer, scaleValue, currentResolution) {
@@ -77,4 +119,28 @@ function getCurrentScale(layer) {
 function formatScaleText({ scaleX, scaleY }) {
   const avgScale = ((scaleX + scaleY) / 2) * 100;
   return Math.abs(scaleX - scaleY) * 100 <= 0.03 ? `缩放:${avgScale.toFixed(2)}%` : `缩放:${(scaleX * 100).toFixed(2)}%|${(scaleY * 100).toFixed(2)}%`;
+}
+
+function getAverageScale(layers) {
+  if (!layers || layers.length === 0) return null;
+
+  let totalScaleX = 0;
+  let totalScaleY = 0;
+  let validLayerCount = 0;
+
+  for (const layer of layers) {
+    const scaleInfo = getCurrentScale(layer);
+    if (scaleInfo) {
+      totalScaleX += scaleInfo.scaleX;
+      totalScaleY += scaleInfo.scaleY;
+      validLayerCount++;
+    }
+  }
+
+  if (validLayerCount === 0) return null;
+
+  return {
+    scaleX: totalScaleX / validLayerCount,
+    scaleY: totalScaleY / validLayerCount,
+  };
 }

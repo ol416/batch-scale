@@ -31,6 +31,24 @@
         sp-button {
             flex: 1;
         }
+        #stepButtons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        #stepButtons sp-button {
+            flex: 0 0 auto; /* Prevent buttons from stretching */
+            width: 48px;
+        }
+        #stepInputContainer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        #stepInput {
+            width: 60px;
+        }
     </style>
 </head>
 <body>
@@ -39,6 +57,14 @@
         <sp-label slot="label">Size (%)</sp-label>
     </sp-textfield>
     <sp-label id="currentScaleDisplay">缩放: --%</sp-label>
+    <div id="stepInputContainer">
+        <sp-label>步进:</sp-label>
+        <sp-textfield id="stepInput" type="number" value="5" min="0.1" max="100"></sp-textfield>
+    </div>
+    <div id="stepButtons">
+        <sp-button id="btnScaleDown" variant="secondary">-</sp-button>
+        <sp-button id="btnScaleUp" variant="secondary">+</sp-button>
+    </div>
     <footer>
         <sp-button id="btnScale" variant="primary">相对缩放</sp-button>
         <sp-button id="btnAbScale" variant="secondary">绝对缩放</sp-button>
