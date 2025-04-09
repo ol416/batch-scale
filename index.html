@@ -31,6 +31,10 @@
         sp-button {
             flex: 1;
         }
+        sp-slider {
+            width: 100%;
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
@@ -39,7 +43,10 @@
         <sp-label slot="label">Size (%)</sp-label>
     </sp-textfield>
     <sp-label id="currentScaleDisplay">缩放: --%</sp-label>
-    <sp-slider id="scaleSlider" min="1" max="1000" value="100"><sp-label slot="label" variant="filled">当前缩放率</sp-label></sp-slider>
+    <sp-slider id="scaleSlider" min="0.01" max="100" value="50" step="0.01" >
+        <sp-label slot="label" variant="filled">当前缩放率</sp-label>
+        <sp-label slot="value" id="sliderValueLabel">100%</sp-label>
+    </sp-slider>
     <footer>
         <sp-button id="btnScale" variant="primary">相对缩放</sp-button>
         <sp-button id="btnAbScale" variant="secondary">绝对缩放</sp-button>
