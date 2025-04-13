@@ -22,14 +22,22 @@ function handleSelectionChange() {
   const activeLayers = app.activeDocument.activeLayers;
   const displayElement = document.getElementById('currentScaleDisplay');
 
+  const scaleValueElement = document.getElementById('scaleValue');
   if (!activeLayers.length) {
-    displayElement.textContent = '当前缩放: --%';
+    scaleValueElement.textContent = '-';
     return;
   }
 
   // Calculate and display the average scale of all selected layers
   const avgScaleInfo = getAverageScale(activeLayers);
-  displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
+  if (avgScaleInfo) {
+    const value = Math.abs(avgScaleInfo.scaleX - avgScaleInfo.scaleY) * 100 <= 0.03 ?
+      `${((avgScaleInfo.scaleX + avgScaleInfo.scaleY) / 2 * 100).toFixed(2)}` :
+      `${(avgScaleInfo.scaleX * 100).toFixed(2)}|${(avgScaleInfo.scaleY * 100).toFixed(2)}`;
+    scaleValueElement.textContent = value || '-';
+  } else {
+    scaleValueElement.textContent = '-';
+  }
 }
 
 // Helper function to select a layer by its ID
