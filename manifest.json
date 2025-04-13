@@ -16,7 +16,7 @@
       "id": "vanilla",
       "minimumSize": {
         "width": 230,
-        "height": 200
+        "height": 250
       },
       "maximumSize": {
         "width": 2000,
@@ -31,7 +31,7 @@
         "height": 300
       },
       "label": {
-        "default": "Starter Panel"
+        "default": "批量图层缩放"
       },
       "icons": [
         {
