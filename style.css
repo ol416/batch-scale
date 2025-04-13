@@ -1,0 +1,85 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    width: 280px;
+    margin: 0 auto;
+}
+
+h2 {
+    margin: 5px 0 10px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+sp-textfield {
+    margin: 5px 0;
+    width: 100%;
+}
+
+#currentScaleDisplay {
+    margin: 5px 0;
+    font-size: 1.1em;
+    color: #333;
+    background-color: rgba(0,0,0,0.05);
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+sp-slider {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+#stepButtons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin: 5px 0;
+}
+
+#stepButtons sp-button {
+    width: 48%;
+}
+
+sp-divider {
+    margin: 5px 0;
+    width: 100%;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 10px;
+    margin-top: 5px;
+    border-top: 1px solid #eee;
+}
+
+footer sp-button {
+    width: 48%;
+    font-size: 1.1em;
+    padding: 4px;
+}
+
+@media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    label {
+      color: #E0E0E0;
+    }
+}

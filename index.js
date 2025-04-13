@@ -23,7 +23,7 @@ function handleSelectionChange() {
   const displayElement = document.getElementById('currentScaleDisplay');
 
   if (!activeLayers.length) {
-    displayElement.textContent = '缩放: --%';
+    displayElement.textContent = '当前缩放: --%';
     return;
   }
 
@@ -164,7 +164,9 @@ function getCurrentScale(layer) {
 
 function formatScaleText({ scaleX, scaleY }) {
   const avgScale = ((scaleX + scaleY) / 2) * 100;
-  return Math.abs(scaleX - scaleY) * 100 <= 0.03 ? `缩放:${avgScale.toFixed(2)}%` : `缩放:${(scaleX * 100).toFixed(2)}%|${(scaleY * 100).toFixed(2)}%`;
+  return Math.abs(scaleX - scaleY) * 100 <= 0.03 ? 
+    `当前缩放: ${avgScale.toFixed(2)}%` : 
+    `当前缩放: ${(scaleX * 100).toFixed(2)}%|${(scaleY * 100).toFixed(2)}%`;
 }
 
 function getAverageScale(layers) {

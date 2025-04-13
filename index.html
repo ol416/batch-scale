@@ -4,70 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photoshop Scale Tool</title>
+    <link rel="stylesheet" href="style.css">
     <script src="index.js" defer></script>
-    <style>
-        body {
-            color:#000000;
-            padding: 16px;
-            font-family: Arial, sans-serif;
-            /* background-color: #333; */
-        }
-        #currentScaleDisplay {
-            color: #767676;
-            font-size: 15px;
-            margin-bottom: 12px;
-            display: block;
-        }
-        sp-textfield {
-            width: 100%;
-            margin-bottom: 12px;
-        }
-        footer {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 12px;
-        }
-        sp-button {
-            flex: 1;
-        }
-        #stepButtons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        #stepButtons sp-button {
-            flex: 0 0 auto; /* Prevent buttons from stretching */
-            width: 48px;
-        }
-        #stepInputContainer {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        #stepInput {
-            width: 60px;
-        }
-    </style>
 </head>
 <body>
-    <h2>Scale Layers</h2>
-    <sp-textfield id="sizeInput" type="number" value="100" min="1" max="1000">
-        <sp-label slot="label">Size (%)</sp-label>
-    </sp-textfield>
-    <sp-label id="currentScaleDisplay">缩放: --%</sp-label>
-    <div id="stepInputContainer">
-        <sp-label>步进:</sp-label>
-        <sp-textfield id="stepInput" type="number" value="5" min="0.1" max="100"></sp-textfield>
+    <div class="wrapper">
+        <h1>图层缩放</h1>
+        <sp-textfield id="sizeInput" type="number" value="100" min="1" max="1000">
+            <sp-label slot="label">缩放比例 (%)</sp-label>
+            <sp-tooltip placement="right">设置缩放比例，100% 为原始大小。</sp-tooltip>
+        </sp-textfield>
+        <sp-label id="currentScaleDisplay">当前缩放: --%</sp-label>
+        <sp-slider id="stepInput" min="0.1" max="100" value="5" step="0.1">
+            <sp-label slot="label">步进值:</sp-label>
+        </sp-slider>
+        <div id="stepButtons">
+            <sp-button id="btnScaleDown" variant="secondary">-</sp-button>
+            <sp-button id="btnScaleUp" variant="secondary">+</sp-button>
+        </div>
+        <sp-divider></sp-divider>
+        <footer>
+            <sp-button id="btnScale" variant="primary">
+                <sp-icon slot="icon" size="s" name="ui:StarOutline"></sp-icon>
+                相对缩放
+            </sp-button>
+            <sp-button id="btnAbScale" variant="secondary">
+                <sp-icon slot="icon" size="s" name="ui:Star"></sp-icon>
+                绝对缩放
+            </sp-button>
+        </footer>
     </div>
-    <div id="stepButtons">
-        <sp-button id="btnScaleDown" variant="secondary">-</sp-button>
-        <sp-button id="btnScaleUp" variant="secondary">+</sp-button>
-    </div>
-    <footer>
-        <sp-button id="btnScale" variant="primary">相对缩放</sp-button>
-        <sp-button id="btnAbScale" variant="secondary">绝对缩放</sp-button>
-    </footer>
 </body>
 </html>
