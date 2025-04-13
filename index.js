@@ -99,7 +99,10 @@ async function processScaling(isAbsolute) {
   // Update the display after scaling all layers
   const displayElement = document.getElementById('currentScaleDisplay');
   const avgScaleInfo = getAverageScale(app.activeDocument.activeLayers);
-  displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
+  const scaleValue = avgScaleInfo ? 
+    `${((avgScaleInfo.scaleX + avgScaleInfo.scaleY) / 2 * 100).toFixed(2)}` : 
+    '--%';
+  document.getElementById('scaleValue').textContent = scaleValue;
 }
 
 // New function for step scaling
@@ -132,7 +135,10 @@ async function processStepScaling(direction) {
   // Update the display after scaling all layers
   const displayElement = document.getElementById('currentScaleDisplay');
   const avgScaleInfo = getAverageScale(app.activeDocument.activeLayers);
-  displayElement.textContent = avgScaleInfo ? formatScaleText(avgScaleInfo) : '缩放: --%';
+  const scaleValue = avgScaleInfo ? 
+    `${((avgScaleInfo.scaleX + avgScaleInfo.scaleY) / 2 * 100).toFixed(2)}` : 
+    '--%';
+  document.getElementById('scaleValue').textContent = scaleValue;
 }
 
 function scaleSmartObjectLayer(layer, scaleValue, currentResolution) {
@@ -170,12 +176,6 @@ function getCurrentScale(layer) {
   return { scaleX, scaleY };
 }
 
-function formatScaleText({ scaleX, scaleY }) {
-  const avgScale = ((scaleX + scaleY) / 2) * 100;
-  return Math.abs(scaleX - scaleY) * 100 <= 0.03 ? 
-    `当前缩放: ${avgScale.toFixed(2)}%` : 
-    `当前缩放: ${(scaleX * 100).toFixed(2)}%|${(scaleY * 100).toFixed(2)}%`;
-}
 
 function getAverageScale(layers) {
   if (!layers || layers.length === 0) return null;
