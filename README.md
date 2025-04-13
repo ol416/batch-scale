@@ -1,45 +1,108 @@
-# UXP Workshop example plugin
+[中文文档](README_zh.md)
 
-This plugin is for getting started with (UXP) plugin development for Adobe Photoshop.
-It allows you to scale multiple layers at once, while keeping them in place.
+# Photoshop Batch Scale Plugin
 
-## How to run the plugin
+This UXP plugin for Adobe Photoshop allows batch scaling of multiple layers while keeping them in place. It's particularly useful for designers working with multiple layers that need consistent scaling.
 
-1) Clone the repository: \
-    `git clone https://github.com/simonhenke/uxp-workshop.git` 
+## Features
+- Scale multiple selected layers simultaneously
+- Maintain layer positions during scaling
+- Simple percentage-based scaling input
+- Preserves layer relationships and compositions
 
-2) Set your Photoshop to Developer mode: Edit > Preferences > Plugins
+## Installation
 
-3) Add the manifest.json to the [Adobe UXP Developer Tool](https://www.adobe.io/photoshop/uxp/devtool/) and load the plugin
+### Reminder: Before using the PS Beta version plugin, please make sure that you have installed Creative Cloud (click here to download) and logged in to your Adobe account.
 
-## Checking out the individual steps
+If Adobe Creative Cloud is not installed, the following image will appear when installing the beta plugin:
 
-The plugin was built in 7 small steps. You can check those out like this:
+If the PS version is lower than 2021, the following image will appear:
 
-1) create new plugin based on starter: `git checkout be6b126`
-2) tidy up and remove unused code: `git checkout ccb2651`
-3) scale layers using the Photshop API: `git checkout cca5a84`
-4) add Spectrum textfield to allow user input: `git checkout 2b38103`
-5) validate the input and notify the user: `git checkout b562035`
-6) persist plugin state using localStorage: `git checkout f405148`
-7) use batchPlay to convert layers to Smart Objects: `git checkout 300c02b`
+## Install the plugin
 
-## Individual steps as file download
+If you have installed and logged in to Creative Cloud, and the PS version is 2021 or above. After downloading the Mockplus plugin, double-click the file to open it:
 
-Alternatively, you can also download the steps as complete folders here:
-https://drive.google.com/file/d/1ua8Ffwk4e7zs5m8JGb2f9E2hVYsSRYFG/view?usp=sharing
+After double-clicking, Creative Cloud will automatically open, click "Local Installation":
 
-## Additional Tasks
-This repository also provides the solutions for two additional tasks:
+The following status indicates successful installation:
 
-### Task 1: Width and Height
-Add inputs for the user to control width and height separately.\
-Add a checkbox to lock the ratio, resulting in both inputs to be synchronized when typing in them.
+Then open the 2021 or later version of PS, "Plug-ins" - "Upload Design", you can start using the PS Beta version plugin.
 
-[View Code](https://github.com/simonhenke/uxp-workshop/tree/width-height)
+## Unable to open the add-in after updating Creative Cloud
 
-### Task 2: Event Listening + Repeating
-Listen to "transform" events and repeat them (using batchPlay) to other layers of choice.
-Let the user set those sync-layers and display them in a list.
+Method 1:
 
-[View Code](https://github.com/simonhenke/uxp-workshop/tree/event-listening)
+1. Please log in with a foreign Adobe account or Google email account, and double-click the plugin to install after logging in.
+
+Method 2:
+
+Mac computer
+
+1. Mac computer opens the terminal. (Shortcut key command + space, search for terminal, and click Enter.)
+
+2. Paste the following code into the terminal:
+
+"/Library/Application Support/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.app/Contents/MacOS/UnifiedPluginInstallerAgent" --install
+
+(Note: There is a space after install)
+
+3. Drag the downloaded Beta version plugin into the terminal and click Enter.
+
+4. After successful installation, restart PS. In the top "Plug-ins" - "Upload Design", you can start using the PS Beta version plugin.
+
+Windows computer
+
+1. Search for "terminal" in the search bar and click Windows PowerShell
+
+2. Paste the following code and press Enter:
+
+cd "C:\Program Files\Common Files\Adobe\Adobe Desktop Common\RemoteComponents\UPI\UnifiedPluginInstallerAgent"
+
+3. Then paste the following code
+
+.\UnifiedPluginInstallerAgent.exe /install
+
+(Note: There is a space after install)
+
+4. Drag the plugin to be installed into the terminal and press Enter.
+
+5. After successful installation, restart PS. In the top "Plug-ins" - "Upload Design", you can start using the PS Beta version plugin.
+
+Method 3:
+
+Mac M1 computers can make the following settings to use the official version of the plugin.
+
+1. Right-click "PS application - Show Introduction", check "Use Rosetta to open". If there is no such option, you can install the latest version of PS software;
+
+2. After checking, download the official version of the PS plugin;
+
+3. After installation, please restart the PS software and wake up the official version of the plugin in the top "Window-Extension".
+
+## Usage
+1. Open your document in Photoshop
+2. Select multiple layers you want to scale
+3. Run the Batch Scale plugin
+4. Enter the desired scale percentage (e.g. 50 for 50%)
+5. Click "Scale" to apply the transformation
+
+## Development Setup
+To modify or extend this plugin:
+
+1. Install dependencies:
+   `npm install`
+
+2. Start development server:
+   `npm run watch`
+
+3. The plugin will automatically reload when you make changes to the source files.
+
+## Project Structure
+- `index.js` - Main plugin logic
+- `index.html` - Plugin UI
+- `style.css` - Plugin styles
+- `manifest.json` - Plugin configuration
+- `batch_scale_PS.ccx` - Photoshop CCX Plugin file
+- `icons/` - Plugin icons for different themes and resolutions
+
+## License
+MIT - See LICENSE file for details
